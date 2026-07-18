@@ -1,0 +1,16 @@
+{
+  "name": "werewolf",
+  "components": {
+    "thermal": { "temperature": 38, "heatCapacity": 4, "conductivity": 0.15 },
+    "flammable": { "ignitionPoint": 250, "burnRate": 0.25, "heatOutput": 100, "fuel": 6 },
+    "liquidCoated": {},
+    "digestive": { "tolerance": 10, "metabolismRate": 0.05 },
+    "impairment": {},
+    "fearProne": { "fearThreshold": 8, "fearDecayRate": 0.4, "fearedTraits": ["CANINE"] },
+    "traits": { "traits": ["LARGE", "FURRY", "CANINE"] },
+    "mobility": { "speed": 1.0, "terrainPenalties": { "water": 0.5 } },
+    "grooming": { "rate": 0.05, "triggerAmount": 0.02 },
+    "health": { "hp": 60, "painThresholdTemperature": 65 },
+    "moveIntent": {}
+  }
+}

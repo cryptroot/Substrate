@@ -1,0 +1,20 @@
+{
+  "seed": 7,
+  "ticks": 120,
+  "columns": 12,
+  "rows": 12,
+  "fillMaterial": "dirt",
+  "paint": [
+    { "material": "grass", "fromCol": 1, "toCol": 10, "fromRow": 4, "toRow": 7 }
+  ],
+  "heat": [
+    { "col": 1, "row": 5, "temperature": 600 }
+  ],
+  "liquids": [
+    { "material": "water", "col": 8, "row": 5, "depth": 3.0 },
+    { "material": "water", "col": 8, "row": 6, "depth": 3.0 }
+  ],
+  "spawns": [
+    { "template": "/data/templates/critter.json", "col": 9, "row": 6 }
+  ]
+}

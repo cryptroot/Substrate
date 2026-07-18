@@ -1,0 +1,16 @@
+{
+  "name": "critter",
+  "components": {
+    "thermal": { "temperature": 37, "heatCapacity": 3, "conductivity": 0.2 },
+    "flammable": { "ignitionPoint": 200, "burnRate": 0.3, "heatOutput": 80, "fuel": 3 },
+    "liquidCoated": {},
+    "digestive": { "tolerance": 2, "metabolismRate": 0.02 },
+    "impairment": {},
+    "fearProne": { "fearThreshold": 12, "fearDecayRate": 0.5, "fearedTraits": ["BURNING"] },
+    "traits": { "traits": ["SMALL", "FURRY"] },
+    "mobility": { "speed": 0.8, "terrainPenalties": { "water": 0.3 } },
+    "grooming": { "rate": 0.03, "triggerAmount": 0.01 },
+    "health": { "hp": 20, "painThresholdTemperature": 55 },
+    "moveIntent": {}
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "seed": 5,
+  "ticks": 60,
+  "columns": 16,
+  "rows": 16,
+  "fillMaterial": "stone",
+  "spawns": [
+    { "template": "/data/templates/werewolf.json", "col": 8, "row": 8 }
+  ]
+}

@@ -112,10 +112,10 @@ What we do build instead:
 
 Give the cat `LiquidCoated`-eligible fur, a grooming behavior, and a `Digestive` component with a low tolerance, and the rest is arithmetic. Nobody authored "the cat gets drunk." Five honestly-scoped systems did their jobs in sequence.
 
-## Suggested repo shape
+## Expected Repository Shape - TODO: Update after further planning
 
 ```
-/core          — ECS engine (existing)
+/core          — ECS engine (JavaGameCore)
 /components    — property definitions (Thermal, Flammable, FearProne, ...)
 /systems       — generic simulators, one file per system, no entity-type checks
 /materials     — data-driven material definitions (ignition points, intoxication, etc.)
@@ -124,6 +124,11 @@ Give the cat `LiquidCoated`-eligible fur, a grooming behavior, and a `Digestive`
 /log           — causality/event logging, queryable after the fact
 /tools         — playtesting harness for isolating and replaying odd interaction chains
 ```
+
+## Language and Build System
+
+Language: Java 21 LTS
+Build: Apache Maven
 
 ## Roadmap
 

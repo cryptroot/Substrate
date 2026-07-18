@@ -1,0 +1,58 @@
+{
+  "materials": [
+    {
+      "name": "stone",
+      "heatCapacity": 4,
+      "conductivity": 0.05
+    },
+    {
+      "name": "dirt",
+      "heatCapacity": 2,
+      "conductivity": 0.1
+    },
+    {
+      "name": "grass",
+      "ignitionPoint": 150,
+      "burnRate": 0.25,
+      "heatOutput": 200,
+      "heatCapacity": 1,
+      "conductivity": 0.6,
+      "fuel": 5
+    },
+    {
+      "name": "wood",
+      "ignitionPoint": 300,
+      "burnRate": 0.2,
+      "heatOutput": 200,
+      "heatCapacity": 2,
+      "conductivity": 0.15,
+      "fuel": 8
+    },
+    {
+      "name": "water",
+      "heatCapacity": 4,
+      "conductivity": 0.5,
+      "viscosity": 0.8,
+      "evaporationRate": 0.002
+    },
+    {
+      "name": "ethanol",
+      "ignitionPoint": 78,
+      "burnRate": 0.6,
+      "heatOutput": 90,
+      "heatCapacity": 2,
+      "conductivity": 0.4,
+      "intoxicatingPotency": 8,
+      "toxicity": 0.02,
+      "viscosity": 0.7,
+      "evaporationRate": 0.004
+    },
+    {
+      "name": "blood",
+      "heatCapacity": 3,
+      "conductivity": 0.4,
+      "viscosity": 0.5,
+      "evaporationRate": 0.001
+    }
+  ]
+}

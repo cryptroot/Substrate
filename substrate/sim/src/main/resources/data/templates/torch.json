@@ -1,0 +1,8 @@
+{
+  "name": "torch",
+  "components": {
+    "thermal": { "temperature": 400, "heatCapacity": 1, "conductivity": 0.05 },
+    "flammable": { "ignitionPoint": 100, "burnRate": 0.05, "heatOutput": 150, "fuel": 50 },
+    "traits": { "traits": [] }
+  }
+}

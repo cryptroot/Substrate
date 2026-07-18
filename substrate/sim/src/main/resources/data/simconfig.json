@@ -1,0 +1,14 @@
+{
+  "ambientTemperature": 20,
+  "ambientCoupling": 0.01,
+  "tileDiffusionRate": 0.35,
+  "quenchHeatPerDepth": 80,
+  "combustionRadiateFraction": 0.3,
+  "coatingPickupRate": 0.05,
+  "fearRadius": 4,
+  "fearGainPerSource": 3,
+  "drunkCourageFactor": 0.5,
+  "impairmentSpeedFactor": 0.6,
+  "staggerChancePerImpairment": 0.3,
+  "heatDamageFactor": 0.1
+}
