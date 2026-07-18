@@ -2,8 +2,6 @@
 
 *A simulation built to misbehave.*
 
-> Working title — swap for whatever you like. The name is a placeholder for the idea: everything in this game sits on top of a shared physical/behavioral substrate, and the game's personality comes from what happens when unrelated systems reach into that substrate at the same time.
-
 ## Design thesis
 
 Most game simulations are built to prevent unintended interactions. Ours is built to permit them, on purpose, as the primary source of content.
