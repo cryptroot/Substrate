@@ -1,0 +1,3 @@
+[submodule "JavaGameCore"]
+	path = JavaGameCore
+	url = git@github.com:cryptroot/JavaGameCore.git
