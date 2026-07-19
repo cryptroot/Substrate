@@ -11,6 +11,18 @@
     "mobility": { "speed": 1.0, "terrainPenalties": { "water": 0.5 } },
     "grooming": { "rate": 0.05, "triggerAmount": 0.02 },
     "health": { "hp": 60, "painThresholdTemperature": 65 },
-    "moveIntent": {}
+    "moveIntent": {},
+    "age": { "age": 0, "maturityAge": 60, "lifespan": 400 },
+    "fertility": { "cooldownTicks": 80 },
+    "reproduceIntent": {},
+    "genome": {
+      "genes": {
+        "fear_sensitivity": [8, 8],
+        "fear_of_water": [0.9, 0.9],
+        "fire_resistance": [250, 250],
+        "gut_tolerance": [10, 10],
+        "leg_speed": [1.0, 1.0]
+      }
+    }
   }
 }

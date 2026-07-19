@@ -9,7 +9,8 @@ import java.util.Map;
  * (data-driven; resolved to ids at template load).
  */
 public final class Mobility implements EntityComponent {
-  public final float speed;
+  /** Mutable: a heritable gene may re-express this every tick; see ExpressionSystem. */
+  public float speed;
   public final Map<Integer, Float> terrainPenalty = new HashMap<>();
 
   public Mobility(float speed) {

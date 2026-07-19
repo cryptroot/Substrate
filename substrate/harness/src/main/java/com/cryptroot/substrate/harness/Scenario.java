@@ -2,8 +2,10 @@ package com.cryptroot.substrate.harness;
 
 import com.cryptroot.substrate.material.MaterialRegistry;
 import com.cryptroot.substrate.material.SimConfig;
+import com.cryptroot.substrate.genetics.GeneRegistry;
 import com.cryptroot.substrate.substrate.TileSubstrate;
 import com.cryptroot.substrate.template.TemplateLoader;
+import com.cryptroot.substrate.template.TemplateRegistry;
 import com.cryptroot.substrate.tick.SimulationLoop;
 import com.cryptroot.substrate.tick.Simulations;
 import com.cryptroot.substrate.world.SimWorld;
@@ -83,10 +85,18 @@ public final class Scenario {
           h.path("col").asInt(), h.path("row").asInt(), (float) h.path("temperature").asDouble());
     }
 
-    SimWorld world = new SimWorld(tiles, materials, config, root.path("seed").asLong(0));
+    SimWorld world =
+        new SimWorld(
+            tiles,
+            materials,
+            config,
+            root.path("seed").asLong(0),
+            GeneRegistry.loadFromResource("/data/genes.json"),
+            TemplateRegistry.empty());
     TemplateLoader loader = new TemplateLoader(materials);
     for (JsonNode s : root.path("spawns")) {
       var template = loader.loadFromResource(s.path("template").asText());
+      world.templates().register(template);
       world.spawn(
           template.instantiate(s.path("col").asInt(), s.path("row").asInt()), template.name());
     }

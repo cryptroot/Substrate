@@ -8,7 +8,7 @@ import com.cryptroot.substrate.world.SimWorld;
 import org.junit.jupiter.api.Test;
 
 /**
- * README roadmap step 1: fire and water behaving honestly against each other, no creatures.
+ * Fire and water behaving honestly against each other, no creatures.
  */
 class FireSpreadQuenchTest {
 

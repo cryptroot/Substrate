@@ -10,7 +10,9 @@ import java.util.Set;
  * a canine-fearing entity with a canine trait frightens itself. That is the product.
  */
 public final class FearProne implements EntityComponent {
-  public final float fearThreshold;
+  /** Mutable: set this once from template data; ExpressionSystem may overwrite it every
+   * tick from a gene's phenotype output — same field, no special-casing between the two writers. */
+  public float fearThreshold;
   public final float fearDecayRate;
   public float currentFear;
   public final Set<String> fearedTraits = new HashSet<>();

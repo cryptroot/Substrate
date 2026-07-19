@@ -7,7 +7,8 @@ import com.cryptroot.core.world.EntityComponent;
  * near-misses. Fuel depletion is the built-in damping term against infinite fire.
  */
 public final class Flammable implements EntityComponent {
-  public final float ignitionPoint;
+  /** Mutable: a heritable gene may re-express this every tick; see ExpressionSystem. */
+  public float ignitionPoint;
   public final float burnRate;
   public final float heatOutput;
   public float fuelRemaining;

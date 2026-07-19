@@ -13,7 +13,7 @@ import com.cryptroot.substrate.world.SimWorld;
  * Compares the traits of everything nearby against each fearful entity's feared-trait list and
  * accumulates fear. The scan DELIBERATELY includes the entity itself — a werewolf that fears
  * canines and carries a CANINE trait frightens itself. Do not "fix" this; it is a feature we
- * declined to prevent (see README).
+ * declined to prevent.
  *
  * <p>Impairment raises the effective fear threshold (liquid courage) — a cross-system interaction
  * that costs zero extra code because both are just numbers.

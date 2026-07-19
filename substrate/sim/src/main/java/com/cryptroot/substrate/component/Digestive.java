@@ -7,7 +7,8 @@ import java.util.Map;
 /** Digestive tract contents and physiology. Keyed by material id. */
 public final class Digestive implements EntityComponent {
   public final Map<Integer, Float> contents = new HashMap<>();
-  public final float tolerance;
+  /** Mutable: a heritable gene may re-express this every tick; see ExpressionSystem. */
+  public float tolerance;
   public final float metabolismRate;
 
   public Digestive(float tolerance, float metabolismRate) {

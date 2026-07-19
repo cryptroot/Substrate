@@ -10,5 +10,8 @@
   "drunkCourageFactor": 0.5,
   "impairmentSpeedFactor": 0.6,
   "staggerChancePerImpairment": 0.3,
-  "heatDamageFactor": 0.1
+  "heatDamageFactor": 0.1,
+  "matingRadius": 3,
+  "mutationRate": 0.05,
+  "mutationJitter": 0.1
 }

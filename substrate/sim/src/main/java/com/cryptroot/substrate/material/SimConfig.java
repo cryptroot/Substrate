@@ -23,6 +23,9 @@ import java.util.Objects;
  * @param impairmentSpeedFactor how much impairment slows movement (1.0 = fully at level 1)
  * @param staggerChancePerImpairment probability per impairment level of a random stagger step
  * @param heatDamageFactor hp lost per degree above an entity's pain threshold per tick
+ * @param matingRadius chebyshev tile radius scanned by the courtship system for a partner
+ * @param mutationRate 0..1 probability per inherited allele of a mutation jitter being applied
+ * @param mutationJitter max magnitude of a mutation's random offset to an allele
  */
 public record SimConfig(
     float ambientTemperature,
@@ -36,7 +39,10 @@ public record SimConfig(
     float drunkCourageFactor,
     float impairmentSpeedFactor,
     float staggerChancePerImpairment,
-    float heatDamageFactor) {
+    float heatDamageFactor,
+    int matingRadius,
+    float mutationRate,
+    float mutationJitter) {
 
   public static SimConfig loadFromResource(String resourcePath) {
     Objects.requireNonNull(resourcePath, "resourcePath must not be null");
@@ -61,6 +67,9 @@ public record SimConfig(
         (float) n.path("drunkCourageFactor").asDouble(0.5),
         (float) n.path("impairmentSpeedFactor").asDouble(0.6),
         (float) n.path("staggerChancePerImpairment").asDouble(0.3),
-        (float) n.path("heatDamageFactor").asDouble(0.1));
+        (float) n.path("heatDamageFactor").asDouble(0.1),
+        n.path("matingRadius").asInt(3),
+        (float) n.path("mutationRate").asDouble(0.05),
+        (float) n.path("mutationJitter").asDouble(0.1));
   }
 }

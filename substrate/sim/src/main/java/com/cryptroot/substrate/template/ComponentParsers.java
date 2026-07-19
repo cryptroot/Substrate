@@ -1,15 +1,20 @@
 package com.cryptroot.substrate.template;
 
 import com.cryptroot.core.world.WorldEntity;
+import com.cryptroot.substrate.component.Age;
 import com.cryptroot.substrate.component.Digestive;
 import com.cryptroot.substrate.component.FearProne;
+import com.cryptroot.substrate.component.Fertility;
 import com.cryptroot.substrate.component.Flammable;
+import com.cryptroot.substrate.component.Genome;
 import com.cryptroot.substrate.component.Grooming;
 import com.cryptroot.substrate.component.Health;
 import com.cryptroot.substrate.component.Impairment;
+import com.cryptroot.substrate.component.Lineage;
 import com.cryptroot.substrate.component.LiquidCoated;
 import com.cryptroot.substrate.component.Mobility;
 import com.cryptroot.substrate.component.MoveIntent;
+import com.cryptroot.substrate.component.ReproduceIntent;
 import com.cryptroot.substrate.component.Thermal;
 import com.cryptroot.substrate.component.Traits;
 import com.cryptroot.substrate.material.MaterialRegistry;
@@ -23,9 +28,7 @@ import java.util.Set;
 
 /**
  * Open registry mapping a JSON component key to the function that builds and attaches that
- * component. This replaces a hardcoded switch so new components (V2: Genome, Fertility, Age,
- * Lineage, ...) register a parser instead of editing a growing branch — see README-v2 "Hardcoded
- * Component Parsing". The registry never inspects entity identity; it only translates data into
+ * component. The registry never inspects entity identity; it only translates data into
  * components.
  */
 public final class ComponentParsers {
@@ -97,6 +100,35 @@ public final class ComponentParsers {
             e.with(Health.class, new Health(f(n, "hp", 10), f(n, "painThresholdTemperature", 60))));
     p.register("impairment", (e, n, m) -> e.with(Impairment.class, new Impairment()));
     p.register("moveIntent", (e, n, m) -> e.with(MoveIntent.class, new MoveIntent()));
+    p.register(
+        "age",
+        (e, n, m) -> e.with(Age.class, new Age(f(n, "age", 0), f(n, "maturityAge", 0), f(n, "lifespan", Float.POSITIVE_INFINITY))));
+    p.register("fertility", (e, n, m) -> e.with(Fertility.class, new Fertility(f(n, "cooldownTicks", 50))));
+    p.register("reproduceIntent", (e, n, m) -> e.with(ReproduceIntent.class, new ReproduceIntent()));
+    p.register(
+        "genome",
+        (e, n, m) -> {
+          Genome genome = new Genome();
+          JsonNode genes = n.path("genes");
+          Iterator<Map.Entry<String, JsonNode>> git = genes.fields();
+          while (git.hasNext()) {
+            Map.Entry<String, JsonNode> gene = git.next();
+            JsonNode alleles = gene.getValue();
+            float a = alleles.size() > 0 ? (float) alleles.get(0).asDouble(0) : 0f;
+            float b = alleles.size() > 1 ? (float) alleles.get(1).asDouble(a) : a;
+            genome.set(gene.getKey(), a, b);
+          }
+          e.with(Genome.class, genome);
+        });
+    p.register(
+        "lineage",
+        (e, n, m) ->
+            e.with(
+                Lineage.class,
+                new Lineage(
+                    (long) n.path("parentAId").asLong(-1),
+                    (long) n.path("parentBId").asLong(-1),
+                    n.path("generation").asInt(0))));
     return p;
   }
 

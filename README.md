@@ -49,36 +49,27 @@ Resist building a "cat AI module" and a separate "dwarf AI module." Build a `Fea
 
 An unforeseen interaction should produce an event, a log line, and maybe a corpse — never a crash and never silent nothing. If two systems fight over the same entity in the same tick, that's a bug in tick ordering, not a reason to firewall the systems apart from each other.
 
-## Scope for v1
+## V1 (shipped): horizontal composition within a tick
 
 Keep the *world* small so the *interaction space* can be large. A flat 2D grid, a handful of creature templates, a handful of item/material types — the fun scales with how many components each thing has, not with map size or roster size.
 
-**World:** flat 2D tile grid. Each tile carries a material, a temperature, and a liquid depth — same substrate idea applied to terrain as to creatures.
+**World:** flat 2D tile grid (`TileSubstrate`). Each tile carries a material, a temperature, and a liquid depth — same substrate idea applied to terrain as to creatures.
 
-**Suggested starting components** (deliberately generic, deliberately reusable):
+**Components** (`substrate/sim/.../component`): `Thermal`, `Flammable`, `LiquidCoated`, `Digestive`, `Impairment`, `FearProne`, `Traits`, `Mobility`, `Grooming`, `Health`, `MoveIntent`, `GridPosition`, `Identity` (numeric id + origin template name, read only for logging — never for behavior).
 
-| Component | Carries | Used by |
-|---|---|---|
-| `Thermal` | temperature, heat capacity | fire spread, freezing, cooking, heatstroke |
-| `Flammable` | ignition point, burn rate | fire spread |
-| `LiquidCoated` | material, amount | grooming, contamination, ingestion |
-| `Digestive` | ingested materials, tolerance | intoxication, poisoning, nutrition |
-| `FearProne` | fear threshold, current fear, feared-trait tags | flee behavior, panic, self-fright |
-| `SocialBond` | relationships map (entity → affinity) | grudges, packs, tantrums |
-| `Odor` | scent material, strength | tracking, attraction, repulsion |
-| `Mobility` | speed, terrain penalties | pathing, fleeing, chasing |
-
-**Suggested starting systems**, each one narrow, each one blind to entity type:
+**Systems** (`substrate/sim/.../system`), each narrow and blind to entity type:
 
 - `ThermalDiffusionSystem` — heat spreads between adjacent tiles and touching entities
-- `CombustionSystem` — anything `Flammable` above its ignition point catches fire and heats its neighbors
-- `FluidFlowSystem` — liquids move downhill/downgrade across the tile grid
-- `GroomingSystem` — entities with a grooming behavior pick up nearby `LiquidCoated` material onto themselves
-- `IngestionSystem` — entities ingest `LiquidCoated` material on themselves or in their mouths into `Digestive`
-- `IntoxicationSystem` — reads `Digestive` contents against material properties (is it alcohol?), applies effects
-- `FearSystem` — compares nearby entities'/traits' `FearProne` tags against an entity's own feared-trait list, including *its own* tags if self-referential checks aren't excluded
+- `FluidFlowSystem` — liquids flow across the tile grid (runs before combustion so water can quench before ignition checks)
+- `CombustionSystem` — anything `Flammable` above its ignition point catches fire and heats its neighbors (tiles and entities alike)
+- `GroomingSystem` — entities with `Grooming` + `LiquidCoated` move body coating to their mouth
+- `IngestionSystem` — mouth-coated liquid moves into `Digestive`
+- `IntoxicationSystem` — reads `Digestive` contents against material potency, produces graded `Impairment`
+- `HealthSystem` — heat above pain threshold and toxic digestive contents damage `Health`; death is a log line and a despawn
+- `FearSystem` — compares nearby entities' `Traits` against an entity's own `FearProne.fearedTraits`, **including its own traits** (no self-exclusion) — this is the werewolf-afraid-of-dogs case: a werewolf with `FearProne { fears: [CANINE] }` and its own `CANINE` trait frightens itself, on purpose
+- `MovementSystem` — resolves `MoveIntent` (flee) or wanders; impairment slows movement and adds stagger
 
-That last one is your werewolf-afraid-of-dogs case: if a werewolf has `FearProne { fears: [Canine] }` and also, say, a partial `Canine` tag from its own lycanthropy, and the fear system doesn't special-case "don't check yourself" — it'll frighten itself. That's not a bug you write. That's a bug you *decline to prevent*.
+Species (`critter`, `werewolf`, `torch`) are pure JSON component bundles in `data/templates/`, loaded by `TemplateLoader` via an open `ComponentParsers` registry (register-a-parser, not a growing switch) — adding a species, or a component type, never touches system code.
 
 ## Guardrails: staying playable inside the chaos
 
@@ -112,31 +103,47 @@ What we do build instead:
 
 Give the cat `LiquidCoated`-eligible fur, a grooming behavior, and a `Digestive` component with a low tolerance, and the rest is arithmetic. Nobody authored "the cat gets drunk." Five honestly-scoped systems did their jobs in sequence.
 
-## Expected Repository Shape - TODO: Update after further planning
+## V2 (shipped): vertical composition across generations
+
+Where V1 collides unrelated systems *within* a tick, V2 adds the other axis: traits colliding *across generations*, so a lineage feels cursed rather than being a roster of independently-configured critters. Full design rationale lives in [README-v2.md](README-v2.md); this section documents what's actually built.
+
+**The core mechanic is a genome layer separate from phenotype.** `Genome` holds two allele values per gene id (one per parent) — nothing more. `ExpressionSystem` runs first in every tick (`Phase.GENETICS`), reads each carried gene against a data-defined rule, and writes the resulting phenotype value into whichever existing component that gene drives. The system itself never knows what a gene "means":
+
+- **`BLEND`** — phenotype = average of the two alleles (the mix)
+- **`MAX`** — phenotype = the stronger allele (both parents' traits express fully, independently)
+- **`THRESHOLD`** — phenotype only writes once the combined alleles clear a data-defined cutoff; below it, the gene sits in `Genome` fully carried and never expressed (the "neither, for now" case — until a later generation's alleles finally clear the bar)
+
+Genes are defined in `data/genes.json`; which component field a gene drives is resolved through an open `ExpressionTargets` registry (`fearThreshold`, `fearedTrait`, `flammableIgnitionPoint`, `digestiveTolerance`, `mobilitySpeed`, `trait`, ...) — adding a new heritable target is registering a target function, never a new branch in `ExpressionSystem`.
+
+**Lifecycle plumbing** (required so reproduction doesn't produce an unbounded population): `Age` (current age, maturity, lifespan) + `AgingSystem` age every entity every tick, kill it past its lifespan, and count down `Fertility`'s post-birth cooldown. `Phase.LIFECYCLE` runs last so newborns start clean next tick.
+
+**Reproduction** mirrors the existing `MoveIntent` pattern: `CourtshipSystem` (cognition phase) sets `ReproduceIntent.partnerId` to the nearest mature, cooldown-ready candidate within `matingRadius`; `ReproductionSystem` (lifecycle phase) resolves mutual pairs the same tick. Offspring are built generically — re-instantiate parent A's own template (its existing component bundle), then replace its `Genome` with one combined from both parents' alleles (per-gene: one allele picked from each parent, with a small data-tunable mutation jitter), and attach a fresh `Age`/`Lineage`. **Explicit design decision** (flagged per CLAUDE.md, not a silent default): there is **no species/breeding-group compatibility gate** — any two mutually-intending, ready, mature entities pair regardless of template, so a critter/werewolf hybrid is allowed to happen exactly like any other honest cross-system collision. `Lineage` (parent ids + generation) is attached to every offspring so "why does this entity fear both fire and water" is traceable through the causality log, not just inferable from the current tick.
+
+## Repository Shape
 
 ```
-/core          — ECS engine (JavaGameCore)
-/components    — property definitions (Thermal, Flammable, FearProne, ...)
-/systems       — generic simulators, one file per system, no entity-type checks
-/materials     — data-driven material definitions (ignition points, intoxication, etc.)
-/entities      — template definitions built purely as component bundles
-/world         — flat grid, tile substrate (material/temp/fluid arrays)
-/log           — causality/event logging, queryable after the fact
-/tools         — playtesting harness for isolating and replaying odd interaction chains
+JavaGameCore/          — ECS engine + demo/tiled/performance modules (see JavaGameCore/CAPABILITIES.md)
+  core/                — World/WorldEntity ECS, render pipeline, grid, pathfinding, physics, events
+substrate/
+  sim/
+    src/main/java/com/cryptroot/substrate/
+      component/       — property components (Thermal, Flammable, FearProne, Genome, Age, Lineage, ...)
+      genetics/        — GeneRule, GeneDefinition, GeneRegistry, ExpressionTargets (data-defined gene rules/targets)
+      material/        — data-driven Material/MaterialRegistry/SimConfig
+      system/          — generic simulators, one file per system, no entity-type checks
+      substrate/       — TileSubstrate (tile material/temperature/fluid arrays)
+      template/        — TemplateLoader + ComponentParsers (JSON component bundles, registry not a switch)
+      tick/            — Phase order, SimulationLoop, SimWorld wiring
+      log/             — causality logging (CausalityLog, ChangeRecord), queryable after the fact
+    src/main/resources/data/ — materials.json, simconfig.json, genes.json, templates/*.json (all tunables)
+    src/test/          — NoIdentityGateTest (mechanical CLAUDE.md enforcement), DeterminismTest, emergent-behavior tests
+  harness/             — ScenarioRunner: runs a JSON scenario headlessly and prints a causality trace for one entity
 ```
 
 ## Language and Build System
 
 Language: Java 21 LTS
-Build: Apache Maven
-
-## Roadmap
-
-1. **Substrate first.** Tile grid with material/temperature/fluid arrays. No creatures yet — just get fire and water behaving honestly against each other.
-2. **One creature, full component set.** A single generic "critter" template with every starting component, to prove systems compose without a second species to contrast against.
-3. **Second species, zero new systems.** Add a second creature template that reuses every existing system with different thresholds. If this requires a new system, something in step 2 was too specific.
-4. **Causality logging + playtest harness.** Before adding more systems, make sure you can explain any given death.
-5. **Grow the system count, not the map.** Each new system should be checked against the full existing roster for accidental (delightful) interactions before being called done.
+Build: Apache Maven — see `substrate/pom.xml`; `mvn -f substrate/pom.xml clean test -Dspotless.check.skip=true` runs the full suite.
 
 ## Closing note
 

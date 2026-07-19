@@ -11,7 +11,7 @@ import com.cryptroot.substrate.world.SimWorld;
 import org.junit.jupiter.api.Test;
 
 /**
- * README roadmap step 3: a second species added with a data file and ZERO new systems. The
+ * A second species added with a data file and ZERO new systems. The
  * werewolf fears canines and carries a CANINE trait — the fear system deliberately doesn't
  * exclude self-scans, so it frightens itself. A bug we declined to prevent.
  */

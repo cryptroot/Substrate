@@ -23,4 +23,11 @@ public final class Identity implements EntityComponent {
   public String subject() {
     return "entity:" + id + "(" + templateName + ")";
   }
+
+  /** The data bundle this entity was instantiated from. Used only for log readability and to
+   * look up a {@link com.cryptroot.substrate.template.TemplateRegistry} entry when constructing
+   * offspring generically \u2014 never read to branch system behavior. */
+  public String origin() {
+    return templateName;
+  }
 }

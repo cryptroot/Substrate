@@ -1,0 +1,9 @@
+{
+  "genes": [
+    { "id": "fear_sensitivity", "rule": "BLEND", "target": "fearThreshold" },
+    { "id": "fear_of_water", "rule": "THRESHOLD", "threshold": 0.6, "target": "fearedTrait", "param": "WATER" },
+    { "id": "fire_resistance", "rule": "MAX", "target": "flammableIgnitionPoint" },
+    { "id": "gut_tolerance", "rule": "BLEND", "target": "digestiveTolerance" },
+    { "id": "leg_speed", "rule": "BLEND", "target": "mobilitySpeed" }
+  ]
+}
